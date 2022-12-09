@@ -1,0 +1,8 @@
+[
+    "GUI",
+    {
+        "elements": {
+            "Cursor": {"a_id": "gui_cursor"}
+        }
+    }
+]
