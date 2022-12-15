@@ -1,5 +1,5 @@
 import pygame as pg
-from data.asset_handler import AssetHandler
+from .asset_handler import AssetHandler
 
 global CHUNKSIZE, TILESIZE, GRAVITY, DECAY
 TILESIZE = 12
@@ -112,7 +112,7 @@ class Entity(pg.sprite.Sprite):
 
     def update(self, d_time=1.0) -> None:
         center = self.center
-        anim_complete = self.anim.update(d_time=d_time)
+        if self.anim.update(d_time=d_time): self.anim.set_anim('def')
         self.center = center
 
         self.x += self.vel[0]

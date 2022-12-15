@@ -1,4 +1,4 @@
 [
     {"anim": "tile_default", "x": 11, "y": 11},
-    {"t": "Spawner", "entity": {"t": "Player", "anim": "test"}, "x": 11, "y": 0 }
+    {"t": "Spawner", "entity": {"t": "Player", "anim": "player"}, "x": 11, "y": 0 }
 ]

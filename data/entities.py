@@ -1,5 +1,5 @@
 import pygame as pg
-from data.containers import *
+from .containers import *
 
 
 class Spawner(Tile):
@@ -59,10 +59,8 @@ class PhysicsEntity(Entity):
 
     def update(self, d_time=1) -> None:
         self.on_ground = False
-        return super().update(d_time)
-
-    def _gravity(self, d_time=1.0):
-        self.vel[1] += GRAVITY * self.grav_mod * d_time
+        if abs(self.vel[0]) > 0.15 or abs(self.vel[1]) > 0.15: self.anim.set_anim('moving', False)
+        super().update(d_time)
 
 
 class Player(PhysicsEntity):
@@ -70,11 +68,12 @@ class Player(PhysicsEntity):
     def __init__(self, id: int, g):
         super(Player, self).__init__(id, g)
         self.g.camera.target_obj = self
-        self.speed = [0.25, 20]
+        self.speed = [0.5, 0.5]
 
         self.listeners = {'move_left': (self.give_velocity, {'x': -1}),
                           'move_right': (self.give_velocity, {'x': 1}),
-                          'jump': (self.give_velocity, {'y': -1})
+                          'move_up': (self.give_velocity, {'y': -1}),
+                          'move_down': (self.give_velocity, {'y': 1})
                          }
         self.execute = {}
 
@@ -82,8 +81,8 @@ class Player(PhysicsEntity):
         removal = []
         for code in self.execute:
             func, data = self.execute[code]
-            func(**data)
-            if data.get('once', False): removal.append(code)
+            res = func(**data)
+            if data.get('once', False) and res: removal.append(code)
         for code in removal: self.execute.pop(code)
 
         super().update(d_time)
@@ -99,4 +98,5 @@ class Player(PhysicsEntity):
 
     def give_velocity(self, x: int=0, y: int=0, mod=int, **_):
         self.vel[0] += x * self.speed[0]
-        self.vel[1] += y * self.speed[1] if self.on_ground else 0
+        self.vel[1] += y * self.speed[1]
+

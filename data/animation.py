@@ -20,10 +20,13 @@ class Animation(object):
         if self.current >= len(self.times) or self.current < 0:
             self.current = len(self.times) - 1 if self.current >= len(self.times) else 0
             if 'on_end' in self.tags:
-                r = eval("self." + self.tags['on_end'])
+                func = getattr(self, self.tags['on_end'], self.loop)
+                r = func()
                 if r: return False  # DENY THE ANIMATION HAS ENDED IF THE TAG CONFIRMS
             if 'next' in self.tags:
-                self.c.set_anim(self.tags['next'], True)
+                return not self.c.set_anim(self.tags['next'])
+            self.current = 0
+            self.timer = 0.0
             return True  # CONFIRM THE ANIMATION HAS ENDED
         else:
             # TODO: ADDITIONAL TAG LOGIC HERE
@@ -34,14 +37,14 @@ class Animation(object):
         self.timer = 0.0
         return True  # CONFIRM LOOP
 
-    def reverse(self, once=False):
+    def reverse(self, once=True):
         if not (once and self.inc < 0):
             self.inc *= -1
             self.current += self.inc
             return True  # CONFIRM REVERSAL
         return False     # DENY REVERSAL IF ALREADY DONE ONCE
 
-    def do_variant(self, var='idle'):
+    def do_idle(self, var='idle'):
         count = len( [a_id for a_id in self.c.animations if a_id.startswith(var)] )
         return self.c.set_anim( var + '_' + str( ran.randint(0, count-1) ) )
 
@@ -55,10 +58,12 @@ class AnimationCollection(object):
         if len(self.animations) > 0:
             self.current = [a_id for a_id in self.animations][0]
         else: self.current = None
+        self.animation_finished = False
 
     def update(self, d_time=1.0):
         if self.current:
-            return self.animations[self.current].update(d_time=d_time)
+            self.animation_finished = self.animations[self.current].update(d_time=d_time)
+            return self.animation_finished
         return False
 
     @property
@@ -68,7 +73,7 @@ class AnimationCollection(object):
         return "", "", 0
 
     def set_anim(self, new: str, reset=True):
-        if new in self.animations:
+        if new in self.animations and self.current != new and not self.animations[new].tags.get('forced', False):
             self.current = new
             if reset:
                 self.animations[new].current = 0

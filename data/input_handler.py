@@ -33,7 +33,7 @@ class InputHandler:
         elif e.type == pg.MOUSEWHEEL:
             pre_bind = 'mouse'
             c_event = 'scroll'
-            data.update( {'y', e.y} )
+            data.update( {'y': e.y} )
 
         GUI_output = 'gui.' + pre_bind + '.' + c_event
         output.append( (GUI_output, data) )

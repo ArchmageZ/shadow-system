@@ -1,6 +1,6 @@
 import pygame as pg, moderngl
-from data.ogl import *
-from data.camera import Camera
+from .ogl import *
+from .camera import Camera
 
 
 class Renderer:
@@ -20,7 +20,7 @@ class Renderer:
         if light_surf: self.l_surf = light_surf
         else:          self.l_surf = pg.Surface(self.RENDER_RES, pg.SRCALPHA)
         self.camera = Camera(g, self.RENDER_RES)
-        self.camera.move_behavior = Camera.smooth
+        # self.camera.move_behavior = Camera.smooth
 
     def render(self):
         render_list = [(o.img, self.camera.apply_scroll(o.pos)) for o in self.g.world.render_list]
@@ -57,7 +57,7 @@ class DisplayHandler:
         self.surf = self.screen.surf
 
         # CREATE DRAWING SURFACES HERE
-        color = (0.95, 0.6, 0.75)
+        color = (0, 0, 0)
         u_data = { 'size' : {'format': '2i', 'data': self.RENDER_RES},
                    'color': {'format': '3f', 'data': color}}
         s = self.create_ogl_surface('render'  , self.RENDER_RES)
